@@ -64,3 +64,18 @@ class UsersPasswordRepository:
         except Exception as error:
             print(f"Error ao criar senha: {str(error)}")
             return False
+        
+    def delete(self, id: str):
+        try:
+            response = self.dynamodb.delete_item(
+                TableName=self.table_name,
+                Key={'id': {'S': id}},
+                ReturnValues="ALL_OLD"
+            )
+            if 'Attributes' in response:
+                return True
+            else:
+                return False
+        except ClientError as e:
+            print(f"Erro ao deletar senha com id '{id}': {e.response['Error']['Message']}")
+            return False

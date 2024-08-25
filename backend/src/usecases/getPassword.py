@@ -3,10 +3,10 @@ from src.usecases.errors.nonExistsPasswordError import NonExistsPasswordError
 
 class GetPassword:
 
-    def __init__(self, userPasswordRepository, validatePasswordService, decrementRemainingQueriesService):
+    def __init__(self, userPasswordRepository, validatePasswordService, manipulatePasswordService):
         self.userPasswordRepository = userPasswordRepository
         self.validatePasswordService = validatePasswordService
-        self.decrementRemainingQueriesService = decrementRemainingQueriesService
+        self.manipulatePasswordService = manipulatePasswordService
 
     def perform(self, passwordId):
         password = self.userPasswordRepository.findById(passwordId)
@@ -14,8 +14,10 @@ class GetPassword:
             raise NonExistsPasswordError()
 
         if not self.validatePasswordService.check(password):
+            self.manipulatePasswordService.destroy(passwordId)
             raise InvalidPasswordError()
 
-        self.decrementRemainingQueriesService.decrement(passwordId)
+        
+        self.manipulatePasswordService.decrement(passwordId)
         return password.get('value').get('S')
         # return self.userPasswordRepository.decryptPassword(password)

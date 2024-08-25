@@ -1,4 +1,4 @@
-class DecrementRemainingQueriesService:
+class ManipulatePasswordService:
     def __init__(self, userPasswordRepository):
         self.userPasswordRepository = userPasswordRepository
 
@@ -7,3 +7,6 @@ class DecrementRemainingQueriesService:
             id, "remaining-queries", 1, 
             expression="#field = #field - :val"
         )
+
+    def destroy(self, id: str):        
+        self.userPasswordRepository.delete(id)

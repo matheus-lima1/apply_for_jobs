@@ -4,7 +4,7 @@ from src.usecases.generatePassword import GeneratePassword
 from src.usecases.ports.userPasswordRepository import UsersPasswordRepository
 from src.usecases.ports.validatePasswordService import ValidatePasswordService
 from src.usecases.ports.generatePasswordValueService import GeneratePasswordValueService
-from src.usecases.ports.decrementRemainingQueriesService import DecrementRemainingQueriesService
+from src.usecases.ports.manipulatePasswordService import ManipulatePasswordService
 
 
 app = Flask(__name__)
@@ -13,8 +13,8 @@ app = Flask(__name__)
 def getPassword(id):
     userPasswordRepository = UsersPasswordRepository()
     validatePasswordService = ValidatePasswordService(userPasswordRepository)
-    decrementRemainingQueriesService = DecrementRemainingQueriesService(userPasswordRepository)
-    getPassword = GetPassword(userPasswordRepository, validatePasswordService, decrementRemainingQueriesService)
+    manipulatePasswordService = ManipulatePasswordService(userPasswordRepository)
+    getPassword = GetPassword(userPasswordRepository, validatePasswordService, manipulatePasswordService)
     try:
         password = getPassword.perform(id)
 

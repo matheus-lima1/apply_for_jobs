@@ -9,7 +9,7 @@ class ValidatePasswordService:
         deadline = int(password.get('deadline', 0).get('N'))
         now = int(time.time())
 
-        if (remainingQueries > 0 and now > deadline):
+        if (remainingQueries > 0 and now < deadline):
             return True
         else:
             return False
