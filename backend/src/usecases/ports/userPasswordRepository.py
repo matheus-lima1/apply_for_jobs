@@ -27,7 +27,25 @@ class UsersPasswordRepository:
             else:
                 return None
         except ClientError as e:
-            print(f"Error finding password: {e.response['Error']['Message']}")
+            print(f"Erro ao buscar senha: {e.response['Error']['Message']}")
+            return None
+        
+    def update(self, id: str, field: str, value: int, expression="#field = :val"):
+        try:
+            self.dynamodb.update_item(
+                TableName=self.table_name,
+                Key={'id': {'S': id}},
+                UpdateExpression=f"SET {expression}",
+                ExpressionAttributeNames={
+                    '#field': field,
+                },
+                ExpressionAttributeValues={
+                    ':val': {'N': str(value)}
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+        except ClientError as e:
+            print(f"Erro ao atualizar senha:: {e.response['Error']['Message']}")
             return None
 
     def create(self, remainingQueries: int, expirationTime: int, value: str):
@@ -44,5 +62,5 @@ class UsersPasswordRepository:
             )
             return id
         except Exception as error:
-            print(f"Error creating item: {str(error)}")
+            print(f"Error ao criar senha: {str(error)}")
             return False

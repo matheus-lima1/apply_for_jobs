@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, make_response, request
-
 from src.usecases.getPassword import GetPassword
 from src.usecases.generatePassword import GeneratePassword
-
 from src.usecases.ports.userPasswordRepository import UsersPasswordRepository
 from src.usecases.ports.validatePasswordService import ValidatePasswordService
 from src.usecases.ports.generatePasswordValueService import GeneratePasswordValueService
+from src.usecases.ports.decrementRemainingQueriesService import DecrementRemainingQueriesService
+
 
 app = Flask(__name__)
 
@@ -13,7 +13,8 @@ app = Flask(__name__)
 def getPassword(id):
     userPasswordRepository = UsersPasswordRepository()
     validatePasswordService = ValidatePasswordService(userPasswordRepository)
-    getPassword = GetPassword(userPasswordRepository, validatePasswordService)
+    decrementRemainingQueriesService = DecrementRemainingQueriesService(userPasswordRepository)
+    getPassword = GetPassword(userPasswordRepository, validatePasswordService, decrementRemainingQueriesService)
     try:
         password = getPassword.perform(id)
 
