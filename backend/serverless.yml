@@ -10,7 +10,7 @@ plugins:
 custom:
   tableName: "users-password-${sls:stage}"
   wsgi:
-    app: app.app
+    app: src/app.app
       
 provider:
   name: aws
