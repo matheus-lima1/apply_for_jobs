@@ -21,7 +21,7 @@ class EncryptionService:
             secretDict = json.loads(secret)
             return secretDict['salt'].encode()
         except Exception as e:
-            print(f"Error retrieving secret (SM): {str(e)}")
+            print(f"Erro ao retornar segredo (SM): {str(e)}")
             raise
 
     def _generateKey(self) -> bytes:

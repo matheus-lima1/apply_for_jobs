@@ -25,7 +25,5 @@ class GeneratePassword:
         if not newPassword:
             raise NonExistsPasswordError()
 
-        # if not self.validatePasswordService.check(password):
-        #     raise InvalidPasswordError()
 
         return newPassword

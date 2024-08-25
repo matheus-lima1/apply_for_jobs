@@ -17,7 +17,8 @@ def getPassword(id):
     userPasswordRepository = UsersPasswordRepository()
     validatePasswordService = ValidatePasswordService(userPasswordRepository)
     manipulatePasswordService = ManipulatePasswordService(userPasswordRepository)
-    getPassword = GetPassword(userPasswordRepository, validatePasswordService, manipulatePasswordService)
+    encryptionService = EncryptionService()
+    getPassword = GetPassword(userPasswordRepository, validatePasswordService, manipulatePasswordService, encryptionService)
     try:
         password = getPassword.perform(id)
 
@@ -34,7 +35,8 @@ def generatePassword():
     data = request.get_json()
 
     userPasswordRepository = UsersPasswordRepository()
-    generatePasswordValueService = GeneratePasswordValueService()
+    validatePasswordService = ValidatePasswordService(userPasswordRepository)
+    generatePasswordValueService = GeneratePasswordValueService(validatePasswordService)
     encryptionService = EncryptionService()
     generatePassword = GeneratePassword(userPasswordRepository, generatePasswordValueService, encryptionService)
     try:

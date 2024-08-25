@@ -4,6 +4,9 @@ import string
 
 class GeneratePasswordValueService:
 
+    def __init__(self, validatePasswordService):
+        self.validatePasswordService = validatePasswordService
+
 
     def generate(self, policies, minLength):
         passwordCharacters = []
@@ -19,7 +22,11 @@ class GeneratePasswordValueService:
 
         if not passwordCharacters:
             raise ValueError("No policies are set to True, cannot generate password.")
-
+        
         password = ''.join(random.choice(passwordCharacters) for _ in range(minLength))
+
+        # melhoria futura > trocar recursão por retry        
+        if not self.validatePasswordService.validatePolicies(password, policies, minLength):
+            return self.generate(policies, minLength)
 
         return password
