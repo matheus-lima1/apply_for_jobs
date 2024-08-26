@@ -3,20 +3,18 @@ from src.usecases.errors.nonExistsPasswordError import NonExistsPasswordError
 
 class GeneratePassword:
 
-    def __init__(self, userPasswordRepository, generatePasswordValueService, encryptionService):
+    def __init__(self, userPasswordRepository, generatePasswordValueService, encryptionService, validatePasswordService):
         self.userPasswordRepository = userPasswordRepository
         self.generatePasswordValueService = generatePasswordValueService
         self.encryptionService = encryptionService
+        self.validatePasswordService = validatePasswordService
 
-    def perform(self, data):
-        remaingQueries = data.get('maxAttempts')
-        expirationTime = data.get('availabilityTime')
-        policies = data.get('policies')
-        minLength = data.get('minLength')
-        passwordAlreadyGenerated = data.get('password')
-
+    def perform(self, remaingQueries, expirationTime, policies, minLength, passwordAlreadyGenerated):
         if passwordAlreadyGenerated:
-            value = passwordAlreadyGenerated
+            if self.validatePasswordService.validatePolicies(passwordAlreadyGenerated, policies, minLength):
+                value = passwordAlreadyGenerated
+            else:
+                raise InvalidPasswordError() 
         else:
             value = self.generatePasswordValueService.generate(policies, minLength)
 
@@ -24,6 +22,5 @@ class GeneratePassword:
         newPassword = self.userPasswordRepository.create(remaingQueries, expirationTime, cryptPassword)
         if not newPassword:
             raise NonExistsPasswordError()
-
 
         return newPassword

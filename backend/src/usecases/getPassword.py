@@ -11,10 +11,11 @@ class GetPassword:
 
     def perform(self, passwordId):
         password = self.userPasswordRepository.findById(passwordId)
+        
         if not password:
             raise NonExistsPasswordError()
 
-        if not self.validatePasswordService.check(password):
+        if not self.validatePasswordService.checkHealth(password):
             self.manipulatePasswordService.destroy(passwordId)
             raise InvalidPasswordError()
 

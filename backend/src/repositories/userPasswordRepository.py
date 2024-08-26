@@ -45,8 +45,9 @@ class UsersPasswordRepository:
                 ReturnValues="UPDATED_NEW"
             )
         except ClientError as e:
-            print(f"Erro ao atualizar senha:: {e.response['Error']['Message']}")
+            print(f"Erro ao atualizar senha '{field}': {e.response['Error']['Message']}")
             return None
+
 
     def create(self, remainingQueries: int, expirationTime: int, value: str):
         id = str(uuid.uuid4())
@@ -62,7 +63,7 @@ class UsersPasswordRepository:
             )
             return id
         except Exception as error:
-            print(f"Error ao criar senha: {str(error)}")
+            print(f"Erro ao criar senha: {str(error)}")
             return False
         
     def delete(self, id: str):
@@ -79,3 +80,4 @@ class UsersPasswordRepository:
         except ClientError as e:
             print(f"Erro ao deletar senha com id '{id}': {e.response['Error']['Message']}")
             return False
+

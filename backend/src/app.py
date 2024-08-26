@@ -1,81 +1,36 @@
-from flask import Flask, jsonify, make_response, request
+from flask import Flask
+from flask_cors import CORS
+
+from src.interfaces.controllers.passwordController import PasswordController
 
 from src.usecases.getPassword import GetPassword
 from src.usecases.generatePassword import GeneratePassword
 
-from src.usecases.ports.userPasswordRepository import UsersPasswordRepository
-from src.usecases.ports.validatePasswordService import ValidatePasswordService
-from src.usecases.ports.generatePasswordValueService import GeneratePasswordValueService
-from src.usecases.ports.manipulatePasswordService import ManipulatePasswordService
-from src.usecases.ports.encryptionService import EncryptionService
+from src.repositories.userPasswordRepository import UsersPasswordRepository
+from src.services.validatePasswordService import ValidatePasswordService
+from src.services.generatePasswordValueService import GeneratePasswordValueService
+from src.services.manipulatePasswordService import ManipulatePasswordService
+from src.services.encryptionService import EncryptionService
 
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/password/<string:id>')
-def getPassword(id):
-    userPasswordRepository = UsersPasswordRepository()
-    validatePasswordService = ValidatePasswordService(userPasswordRepository)
-    manipulatePasswordService = ManipulatePasswordService(userPasswordRepository)
-    encryptionService = EncryptionService()
-    getPassword = GetPassword(userPasswordRepository, validatePasswordService, manipulatePasswordService, encryptionService)
-    try:
-        password = getPassword.perform(id)
+userPasswordRepository = UsersPasswordRepository()
+validatePasswordService = ValidatePasswordService(userPasswordRepository)
+generatePasswordValueService = GeneratePasswordValueService(validatePasswordService)
+manipulatePasswordService = ManipulatePasswordService(userPasswordRepository)
+encryptionService = EncryptionService()
 
-        return make_response(jsonify({
-            'data': password
-        }), 200)
-    except Exception as error:
-        return make_response(jsonify({
-            "message": str(error)
-        }), 400)
-    
+getPasswordUseCase = GetPassword(userPasswordRepository, validatePasswordService, manipulatePasswordService, encryptionService)
+generatePasswordUseCase = GeneratePassword(userPasswordRepository, generatePasswordValueService, encryptionService, validatePasswordService)
+
+passwordController = PasswordController(getPasswordUseCase, generatePasswordUseCase)
+
+@app.route('/password/<string:id>', methods=['GET'])
+def get_password(id):
+    return passwordController.getPassword(id)
+
 @app.route('/password', methods=['POST'])
-def generatePassword():
-    data = request.get_json()
-
-    userPasswordRepository = UsersPasswordRepository()
-    validatePasswordService = ValidatePasswordService(userPasswordRepository)
-    generatePasswordValueService = GeneratePasswordValueService(validatePasswordService)
-    encryptionService = EncryptionService()
-    generatePassword = GeneratePassword(userPasswordRepository, generatePasswordValueService, encryptionService)
-    try:
-        newPassword = generatePassword.perform(data)
-
-        return make_response(jsonify({
-            'data': newPassword
-        }), 200)
-    except Exception as error:
-        return make_response(jsonify({
-            "message": str(error)
-        }), 400)
-
-
-
-
-
-@app.route('/teste/<string:name>')
-def teste(name):
-    return make_response(jsonify(
-        {
-            'message': 'Hello ' + name
-        }), 200)
-
-@app.route('/teste', methods=['POST'])
-def create():
-    name = request.json.get('name')
-
-    if not name:
-        return make_response(jsonify({
-            'message': 'Campo "name" é obrigatório'
-        }), 400)
-    
-    return make_response(jsonify({
-        'message': 'Hello ' + name
-    }), 200)
-
-
-
-@app.errorhandler(404)
-def resource_not_found(e):
-    return make_response(jsonify(error='Not found!'), 404)
+def generate_password():
+    return passwordController.generatePassword()

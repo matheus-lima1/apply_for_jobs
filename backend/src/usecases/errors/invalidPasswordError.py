@@ -1,4 +1,4 @@
 class InvalidPasswordError(Exception):
         def __init__(self):
-            message = 'Senha indisponível para visualização'
+            message = 'Senha inválida'
             super().__init__(message)
