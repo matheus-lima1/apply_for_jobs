@@ -9,7 +9,8 @@ class UsersPasswordRepository:
     def __init__(self, dynamodb=None):
         self.table_name = 'users-password-dev'
         if not dynamodb:
-            session = boto3.Session(profile_name='personal')
+            # session = boto3.Session(profile_name='personal')
+            session = boto3.session.Session()
             self.dynamodb = session.client('dynamodb', region_name='us-east-1')
         else:
             self.dynamodb = dynamodb
