@@ -15,6 +15,7 @@ No back-end, as informações de senha são manipuladas e armazenadas em uma tab
 **1) Gerar Senha**
 
 [POST] ${URL}/password
+```
 {
   "policies": {
     "uppercase": boolean,
@@ -27,25 +28,29 @@ No back-end, as informações de senha são manipuladas e armazenadas em uma tab
   "availabilityTime": integer,
   "password": string | null
 }
+```
 
 Esse *endpoint* recebe as políticas de senha que devem ser seguidas, o número mínimo de caracteres exigido, o número máximo de consultas permitidas, o tempo de disponibilidade da senha em segundos, e um valor de senha em formato de string - caso o usuário tenha escolhido sua própria senha - se o valor de senha for nulo, o back-end quem gerará a senha. As senhas geradas são criptografadas por um algoritmo de criptografia simétrica, utilizando uma chave armazenada no **AWS Secrets Manager** para evitar exposição em código *hardcoded*. O formato da resposta segue o padrão:
-
+```
 {
     "id": string
 }
+```
 
 **2) Consultar Senha **
 
 [GET] ${URL}/password/${passwor-id}
 
 Esse *endpoint* retorna a senha solicitada, desde que ainda esteja dentro do prazo de validade e não tenha excedido o número máximo de consultas permitidas. Essas verificações também removem senhas que não atendem mais a esses critérios, garantindo redundância caso o TTL (configurado no DynamoDB) ainda não tenha realizado a exclusão ou o limite de consultas tenha sido atingido. Como resultado, a senha descriptografada é retornada:
-
+```
 {
     "password": string
 }
+```
 
 #### - Organização de pastas do back-end
 
+```
 src/
 ├── interfaces/
 │   ├── controllers/
@@ -55,6 +60,7 @@ src/
 ├── usecases/
 │   └── errors/
 └── app.py
+```
 
 A estrutura segue princípios de Clean Architecture, sendo escolhido pensando em expor uma visão de projeto voltada a colaboração, clareza e manutenção, reutilização de código e escalabilidade.
 
