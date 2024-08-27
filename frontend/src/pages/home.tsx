@@ -51,7 +51,7 @@ export default function Home() {
 
   const handleGeneratePassword = () => {
     setLoading(true);
-    axios.post('http://localhost:5000/password', buildPayload(passwordSettings, policies))
+    axios.post('https://zgycemhwzl.execute-api.us-east-1.amazonaws.com/password', buildPayload(passwordSettings, policies))
       .then((response) => {
         console.log(JSON.stringify(response))
         if (response.status === 200) {
@@ -68,7 +68,7 @@ export default function Home() {
   const handleSavePassword = () => {
     if (validatePassword(password, policies, passwordSettings.minLength)) {
       setLoading(true);
-      axios.post('http://localhost:5000/password', buildPayload(passwordSettings, policies, password))
+      axios.post('https://zgycemhwzl.execute-api.us-east-1.amazonaws.com/password', buildPayload(passwordSettings, policies, password))
         .then((response) => {
           if (response.status === 200) {
             setAccessUrl(`${window.location.origin}/view/${response.data.id}`);

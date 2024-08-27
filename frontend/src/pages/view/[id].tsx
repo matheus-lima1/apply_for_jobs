@@ -11,7 +11,7 @@ const PasswordView = () => {
 
   useEffect(() => {
     if (id) {
-      axios.get(`http://localhost:5000/password/${id}`)
+      axios.get(`https://zgycemhwzl.execute-api.us-east-1.amazonaws.com/password/${id}`)
         .then(response => {
           setPassword(response.data.password);
           setLoading(false);
