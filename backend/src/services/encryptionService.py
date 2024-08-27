@@ -11,8 +11,8 @@ class EncryptionService:
         self.fernet = Fernet(self.key)
 
     def _getSaltFromSecretsManager(self) -> bytes:
-        # session = boto3.session.Session()
-        session = boto3.Session(profile_name='personal')
+        session = boto3.session.Session()
+        # session = boto3.Session(profile_name='personal')
         client = session.client(service_name='secretsmanager', region_name='us-east-1')
 
         try:
