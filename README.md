@@ -94,3 +94,9 @@ A estrutura segue princípios de Clean Architecture, sendo escolhido pensando em
 - *Services*: encapsulam operações/funcionalidades centralizando essas lógicas;
 
 - *Usecases*: contemplam a lógica de negócios, coordenando a execução das tarefas e manipulação de dados connforme as regras.
+
+**3) Auditoria e Logging**
+
+Para garantir os dados necessários para processos de auditoria, seria interessante o sistema ter acesso a alguma informação que identifique o usuário para quem a senha está sendo gerada. Com isso, seria possível o registro de eventos de geração e destruição de senhas relacionados ao usuário em questão, e com esses dados prover informações para relatórios, métricas ou contestações ao sistema.
+
+No quesito de logging, o projeto provê dos registros capturados a nível de código e expostos no **AWS CloudWatch**. No entanto, para um sistema em produção é interessante o uso de recursos que possibilitem um melhor monitoramento da aplicação em tempo de execução. Para isso, existem bibliotecas que atendam esses quesitos e promovem uma melhoria em diagnósticos e depuração.
