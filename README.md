@@ -12,6 +12,8 @@ Essa aplicação se comunica com uma API REST, disponibilizada por meio do **AWS
 
 No back-end, as informações de senha são manipuladas e armazenadas em uma tabela no **AWS DynamoDB**, que possui os seguintes atributos: id (identificador do registro), deadline (prazo de validade do registro, **utilizado para configurar o TTL**), remaining-queries (quantidade de consultas restantes ao registro), e value (valor da senha criptografada). As operações no back-end foram organizadas em duas rotas:
 
+![Modelo do Banco](./dynamo.png)
+
 **1) Gerar Senha**
 
 [POST] ${URL}/password
