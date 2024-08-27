@@ -16,7 +16,7 @@ No back-end, as informações de senha são manipuladas e armazenadas em uma tab
 
 **1) Gerar Senha**
 
-[POST] ${URL}/password
+[POST] https://zgycemhwzl.execute-api.us-east-1.amazonaws.com/password
 ```
 {
   "policies": {
@@ -41,7 +41,7 @@ Esse *endpoint* recebe as políticas de senha que devem ser seguidas, o número 
 
 **2) Consultar Senha**
 
-[GET] ${URL}/password/${passwor-id}
+[GET] https://zgycemhwzl.execute-api.us-east-1.amazonaws.com/password/${password-id}
 
 Esse *endpoint* retorna a senha solicitada, desde que ainda esteja dentro do prazo de validade e não tenha excedido o número máximo de consultas permitidas. Essas verificações também removem senhas que não atendem mais a esses critérios, garantindo redundância caso o TTL (configurado no DynamoDB) ainda não tenha realizado a exclusão ou o limite de consultas tenha sido atingido. Como resultado, a senha descriptografada é retornada:
 ```
