@@ -37,7 +37,7 @@ Esse *endpoint* recebe as políticas de senha que devem ser seguidas, o número 
 }
 ```
 
-**2) Consultar Senha **
+**2) Consultar Senha**
 
 [GET] ${URL}/password/${passwor-id}
 
@@ -47,6 +47,27 @@ Esse *endpoint* retorna a senha solicitada, desde que ainda esteja dentro do pra
     "password": string
 }
 ```
+
+Os casos de exemplo definidos no desafio foram comtemplados utilizando dos recursos apresentados acima e implementados da forma exposta nos seguintes diagramas. A interação entre o usuário e o sistema é feita através da interface feita em React, e a comunicação entre o sistema e o banco de dados através do back-end (Lambda) em Python:
+
+A) Exemplo 01
+
+![Exemplo](./example1.svg)
+
+
+
+B) Exemplo 02
+
+![Exemplo](./example2.svg)
+
+
+
+C) Exemplo 03
+
+![Exemplo](./example3.svg)
+
+
+
 
 #### - Organização de pastas do back-end
 
