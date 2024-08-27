@@ -1,7 +1,7 @@
 org: omatheuslima
 service: password-generator-backend
 frameworkVersion: "3"
-profile: personal
+#  profile: personal
 
 plugins:
   - serverless-wsgi
@@ -14,7 +14,7 @@ custom:
       
 provider:
   name: aws
-  runtime: python3.12
+  runtime: python3.9
   iam:
     role:
       statements:
@@ -28,6 +28,11 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [UsersPasswordTable, Arn]
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - "arn:aws:secretsmanager:us-east-1:869935087758:secret:dev/test-salt-pgtCHJ"
   environment:
     USERS_PASSWORD_TABLE: ${self:custom.tableName}
 
