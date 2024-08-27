@@ -37,7 +37,7 @@ Esse *endpoint* recebe as políticas de senha que devem ser seguidas, o número 
 }
 ```
 
-**2) Consultar Senha **
+**2) Consultar Senha**
 
 [GET] ${URL}/password/${passwor-id}
 
@@ -47,6 +47,27 @@ Esse *endpoint* retorna a senha solicitada, desde que ainda esteja dentro do pra
     "password": string
 }
 ```
+
+Os casos de exemplo definidos no desafio foram comtemplados utilizando dos recursos apresentados acima e implementados da forma exposta nos seguintes diagramas. A interação entre o usuário e o sistema é feita através da interface feita em React, e a comunicação entre o sistema e o banco de dados através do back-end (Lambda) em Python:
+
+A) Exemplo 01
+
+![Exemplo](./example1.svg)
+
+
+
+B) Exemplo 02
+
+![Exemplo](./example2.svg)
+
+
+
+C) Exemplo 03
+
+![Exemplo](./example3.svg)
+
+
+
 
 #### - Organização de pastas do back-end
 
@@ -73,3 +94,9 @@ A estrutura segue princípios de Clean Architecture, sendo escolhido pensando em
 - *Services*: encapsulam operações/funcionalidades centralizando essas lógicas;
 
 - *Usecases*: contemplam a lógica de negócios, coordenando a execução das tarefas e manipulação de dados connforme as regras.
+
+**3) Auditoria e Logging**
+
+Para garantir os dados necessários para processos de auditoria, seria interessante o sistema ter acesso a alguma informação que identifique o usuário para quem a senha está sendo gerada. Com isso, seria possível o registro de eventos de geração e destruição de senhas relacionados ao usuário em questão, e com esses dados prover informações para relatórios, métricas ou contestações ao sistema.
+
+No quesito de logging, o projeto provê dos registros capturados a nível de código e expostos no **AWS CloudWatch**. No entanto, para um sistema em produção é interessante o uso de recursos que possibilitem um melhor monitoramento da aplicação em tempo de execução. Para isso, existem bibliotecas que atendam esses quesitos e promovem uma melhoria em diagnósticos e depuração.
