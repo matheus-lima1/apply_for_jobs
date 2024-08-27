@@ -1,68 +1,69 @@
-# Avaliação de conhecimentos em Desenvolvimento de Software
+## Avaliação de conhecimentos em Desenvolvimento de Software
 
-## Considere a seguinte necessidade:
- 
-Precisamos enviar uma senha de maneira segura para um cliente. Para isso, ao invés de encaminhá-la via E-mail, SMS, Slack, etc, foi dado como solução o desenvolvimento de um sistema com as seguintes funções:
- 
-1- Usuário irá inserir uma <strong>senha</strong> ou solicitar ao Sistema para gerar <strong>senha aleatória</strong> baseada em <strong>políticas de complexidade</strong> (tipo de caracteres, números, letras, tamanho, etc); 
-- **Exemplo1**: o usuário digita sua senha no campo de texto;
-- **Exemplo2**: o usuário seleciona os parametros de complexidade de senha e ao clicar no botão "Gerar Senha" irá obter uma senha aleatória;
+Foi construído um sistema para geração e exibição de senhas, para evitar que as mesmas fossem compartilhadas via e-mail, sms ou aplicativos terceiros de mensagem. [Clique aqui para acessar](https://application-matheus-lima.d1tmawor3xqx2z.amplifyapp.com/home "Clique aqui para acessar")
 
-2- Usuário irá especificar <strong>quantas vezes</strong> a senha gerada poderá ser vista e <strong>qual o tempo</strong> que a senha ficará válida;
-- **Exemplo**: o usuário irá especificar que a senha possa ser vista apenas <em>duas vezes</em> pelo prazo de <em>um dia</em>;
+#### - Construção do Sistema
 
-3- O sistema irá <strong>gerar uma URL</strong> que dá acesso a visualização da senha, baseando-se nos critérios do item 02;
-- **Exemplo**: o usuário enviará a URL para que o cliente possa visualizar a senha;
+![Arquitetura do Sistema](./design.png)
 
-4- Após atingir a quantidade de visualizações ou o tempo disponível, o sistema <strong>bloqueia/elimina</strong> a visualização da senha (expirado).
-A senha <strong>não deve ser armazenada</strong> após sua expiração
-- **Exemplo1**: 
-    Senha foi gerada para 2 visualizações e 2 dias de prazo. 
-    Cliente clicou na url 3 vezes seguidas no primeiro dia.
-    1º acesso: senha disponível e pôde ser visualizada. Contador atualizado para 1 view
-    2º acesso: senha disponível e pôde ser visualizada. Contador atualizado para 2 views=limite definido. Senha deletada
-    3º acesso: senha já deletada da base. Retorna mensagem de senha indispovível
-- **Exemplo2**: 
-    Senha foi gerada para 2 visualizações e 2 dias de prazo. 
-    Cliente só clicou na url depois de 4 dias que a mesma foi gerada.
-    1º acesso: senha já deletada da base após o prazo de 2 dias. Retorna mensagem de senha indispovível
-- **Exemplo3**: 
-    Senha foi gerada para 2 visualizações e 2 dias de prazo. 
-    Cliente clicou na url 2 vezes: uma assim que recebeu a mesma e a segunda depois de 5 dias.
-    1º acesso: senha disponível e pôde ser visualizada. Contador atualizado para 1 view
-    2º acesso: senha já deletada da base após o prazo de 2 dias. Retorna mensagem de senha indispovível
+Toda a infraestrutura do projeto foi desenvolvida com base no conceito de **serverless**. Para o front-end, foi criada uma aplicação em **React e TypeScript** que apresenta um formulário simples para a definição de políticas de senha, permitindo tanto o preenchimento manual quanto a geração automática de senhas pelo sistema. A aplicação também inclui um modal que exibe o link para visualização de uma senha gerada e uma tela específica para essa ação. O **AWS Amplify** foi utilizado para o deploy dessa aplicação front-end.
 
-## Design
+Essa aplicação se comunica com uma API REST, disponibilizada por meio do **AWS API Gateway**, que atua como intermediário entre o cliente web e o back-end. O back-end, construído em **Python**, é gerido por funções do **AWS Lambda**.
 
-1 - <strong>Monte um desenho</strong> com a arquitetura desse sistema, considerando todos os <strong>componentes e tecnologias</strong> necessárias para o seu correto funcionamento. Considere essa topologia utilizando, obrigatoriamente, provedores de nuvens públicas trabalhando com o <strong>conceito de serverless</strong>. Escolha a nuvem que tiver mais conforto em trabalhar (AWS, GCP, Azure, etc). Para o backend recomendamos o uso dos serviços:
-- AWS: Lambda, API Gateway, DynamoDB, entre outros que não precisem de servidor (dessa forma, desaconselhamos o uso de EC2, EKS, RDS, etc)
-- GCP: Cloud Functions, Cloud Endpoints, Cloud Firestore, entre outros que não precisem de servidor (dessa forma, desaconselhamos o uso de Compute Engine, GKE, Cloud SQL, etc)
-- Azure: Functions, API Management, CosmosDB, entre outros que não precisem de servidor (dessa forma, desaconselhamos o uso de Virtual Machine, AKS, SQL Database, etc)
- 
-2 - Explique como atender cada uma das 4 funções elencadas acima (requisítos) e o racional de sua decisão. 
-- **Exemplo**: A senha aleatória será gerada no front-end por xyz, ou será gerada com uma função no backend por abc.
- 
-3 - <strong>Opcional:</strong> Avalie quais <strong>controles de segurança</strong> são pertinentes para esse sistema, com o objetivo de protegê-lo ao máximo, evitando vazamento de dados (ex: considere o <strong>OWASP Top10</strong>). Questões de auditoria e logging são importantes também. 
+No back-end, as informações de senha são manipuladas e armazenadas em uma tabela no **AWS DynamoDB**, que possui os seguintes atributos: id (identificador do registro), deadline (prazo de validade do registro, **utilizado para configurar o TTL**), remaining-queries (quantidade de consultas restantes ao registro), e value (valor da senha criptografada). As operações no back-end foram organizadas em duas rotas:
 
-4 - Sinta-se livre para adicionar seus comentários de novas melhorias que você julgar desejável. A TOTVS estimula a criatividade e a liberdade de expressão!
- 
-Faça uma sucinta explicação sobre o racional do seu desenho.
+**1) Gerar Senha**
 
-Essa documentação pode ser entregue em um arquivo pdf ou como parte da documentação no repositório (Arquivos MarkDown com topologia no Draw.io, etc)
+[POST] ${URL}/password
+{
+  "policies": {
+    "uppercase": boolean,
+    "lowercase": boolean,
+    "numeric": boolean,
+    "special": boolean
+  },
+  "minLength": integer,
+  "maxAttempts": integer,
+  "availabilityTime": integer,
+  "password": string | null
+}
 
-## Implementação
+Esse *endpoint* recebe as políticas de senha que devem ser seguidas, o número mínimo de caracteres exigido, o número máximo de consultas permitidas, o tempo de disponibilidade da senha em segundos, e um valor de senha em formato de string - caso o usuário tenha escolhido sua própria senha - se o valor de senha for nulo, o back-end quem gerará a senha. As senhas geradas são criptografadas por um algoritmo de criptografia simétrica, utilizando uma chave armazenada no **AWS Secrets Manager** para evitar exposição em código *hardcoded*. O formato da resposta segue o padrão:
 
-Faça um Fork desse repositório, Crie uma branch com seu nome (ex: application/jose_silva). 
+{
+    "id": string
+}
 
-Selecione uma das linguagens abaixo para implementar o backend do projeto:
-- Python
-- C (e suas variações)
-- Golang
+**2) Consultar Senha **
 
-Selecione um dos frameworks abaixo para implementar o frontend do projeto:
-- ReactJC
-- AngularJS
+[GET] ${URL}/password/${passwor-id}
 
-Envie um PR nesse repositorio do GitHub contendo <strong>as implementações</strong> do projeto com base na arquitetura descrita que você desenvolveu do sistema (Queremos avaliar sua lógica de programação e estruturação do código). 
+Esse *endpoint* retorna a senha solicitada, desde que ainda esteja dentro do prazo de validade e não tenha excedido o número máximo de consultas permitidas. Essas verificações também removem senhas que não atendem mais a esses critérios, garantindo redundância caso o TTL (configurado no DynamoDB) ainda não tenha realizado a exclusão ou o limite de consultas tenha sido atingido. Como resultado, a senha descriptografada é retornada:
 
-Para testar as implementações de seu projeto antes de enviar, recomendamos o uso do free tier das nuvens públicas ou projetos que emulem localmente tais nuvens como o localstack (https://github.com/localstack/localstack).
+{
+    "password": string
+}
+
+#### - Organização de pastas do back-end
+
+src/
+├── interfaces/
+│   ├── controllers/
+│   └── presenters/
+├── repositories/
+├── services/
+├── usecases/
+│   └── errors/
+└── app.py
+
+A estrutura segue princípios de Clean Architecture, sendo escolhido pensando em expor uma visão de projeto voltada a colaboração, clareza e manutenção, reutilização de código e escalabilidade.
+
+- *Controllers*: responsáveis por lidar com as requisições externas, recebendo as entradas de usuário e chamando os casos de uso apropriados;
+
+- *Presenters*: isolam e padronizam as respostas do restante da aplicação;
+
+- *Repositories*: responsáveis pelas ações de persistência de dados, forecendo uma abastração para essa camada;
+
+- *Services*: encapsulam operações/funcionalidades centralizando essas lógicas;
+
+- *Usecases*: contemplam a lógica de negócios, coordenando a execução das tarefas e manipulação de dados connforme as regras.
